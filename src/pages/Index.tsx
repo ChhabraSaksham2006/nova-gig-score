@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import NovaScore from '@/components/NovaScore';
 import FeatureCard from '@/components/FeatureCard';
+import NovaScoreForm from '@/components/NovaScoreForm';
 import { 
   TrendingUp, 
   Shield, 
@@ -213,50 +214,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Demo Section */}
+      {/* Interactive Demo Section */}
       <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                See Your <span className="text-gradient-primary">Nova Score</span>
-              </h2>
-              <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-                Upload your simulated gig profile or connect with your platform to get 
-                your Nova Score in seconds and understand the key drivers behind it.
-              </p>
-            </div>
-
-            <Card className="nova-card p-8 max-w-md mx-auto fade-in-up">
-              <div className="space-y-6">
-                <NovaScore score={demoScore} size="lg" />
-                
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Earnings Stability</span>
-                    <span className="font-semibold text-success">92%</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Customer Rating</span>
-                    <span className="font-semibold text-success">4.8/5</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Reliability Score</span>
-                    <span className="font-semibold text-warning">78%</span>
-                  </div>
-                </div>
-
-                <Button 
-                  variant="nova" 
-                  size="lg" 
-                  className="w-full"
-                  onClick={handleDemoScore}
-                >
-                  Generate New Score
-                </Button>
-              </div>
-            </Card>
-          </div>
+          <NovaScoreForm />
         </div>
       </section>
 
