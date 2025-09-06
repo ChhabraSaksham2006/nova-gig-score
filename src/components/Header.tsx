@@ -53,6 +53,8 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
     { label: 'Home', sectionId: 'hero' },
     { label: 'About Nova', sectionId: 'about-nova' },
     { label: 'How It Works', sectionId: 'how-it-works' },
+    { label: 'Comparison', sectionId: 'nova-comparison' },
+    { label: 'FAQ', sectionId: 'nova-faq' },
     { label: 'Get Score', sectionId: 'nova-score-form' },
   ];
 

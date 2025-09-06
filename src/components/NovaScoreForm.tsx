@@ -20,6 +20,29 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Icon animation hook
+const useIconAnimation = () => {
+  const [animatingIcons, setAnimatingIcons] = useState<Set<string>>(new Set());
+
+  const triggerIconAnimation = (iconId: string, animationType: 'bounce' | 'spin' | 'pulse' = 'bounce') => {
+    setAnimatingIcons(prev => new Set(prev).add(`${iconId}-${animationType}`));
+    setTimeout(() => {
+      setAnimatingIcons(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${iconId}-${animationType}`);
+        return newSet;
+      });
+    }, 600);
+  };
+
+  const getIconClasses = (iconId: string, animationType: 'bounce' | 'spin' | 'pulse' = 'bounce') => {
+    const key = `${iconId}-${animationType}`;
+    return animatingIcons.has(key) ? `icon-${animationType}` : '';
+  };
+
+  return { triggerIconAnimation, getIconClasses };
+};
+
 interface FormData {
   monthly_earnings: string;
   active_days_per_month: string;
@@ -52,6 +75,7 @@ interface ScoreResult {
 
 const NovaScoreForm: React.FC = () => {
   const { toast } = useToast();
+  const { triggerIconAnimation, getIconClasses } = useIconAnimation();
   const [formData, setFormData] = useState<FormData>({
     monthly_earnings: '',
     active_days_per_month: '',
@@ -73,15 +97,27 @@ const NovaScoreForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ScoreResult | null>(null);
   const [showForm, setShowForm] = useState(true);
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
 
   const handleInputChange = (field: keyof FormData, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Remove field from errors if it now has a value
+    if (value && fieldErrors.has(field)) {
+      setFieldErrors(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(field);
+        return newSet;
+      });
+    }
   };
 
   const loadDemoData = () => {
+    triggerIconAnimation('sparkles', 'spin');
+    
     setFormData({
       monthly_earnings: '3500',
       active_days_per_month: '22',
@@ -227,9 +263,35 @@ const NovaScoreForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    const requiredFields: (keyof FormData)[] = [
+      'monthly_earnings', 'active_days_per_month', 'earnings_per_active_day',
+      'cancellation_rate', 'earnings_avg_6mo', 'earnings_avg_3mo'
+    ];
+    
+    const errors = new Set<string>();
+    requiredFields.forEach(field => {
+      if (!formData[field] || formData[field] === '') {
+        errors.add(field);
+      }
+    });
+    
+    if (errors.size > 0) {
+      setFieldErrors(errors);
+      triggerIconAnimation('alert', 'bounce');
+      toast({
+        title: "Please fill in all required fields",
+        description: "All fields marked with * are required for accurate scoring.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    triggerIconAnimation('calculate', 'spin');
     setIsLoading(true);
     
-    // Simulate API call
+    // Simulate API call with loading animation
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     const calculatedResult = calculateNovaScore(formData);
@@ -267,9 +329,9 @@ const NovaScoreForm: React.FC = () => {
 
   if (!showForm && result) {
     return (
-      <div className="max-w-4xl mx-auto space-y-8 fade-in-up">
+      <div className="max-w-4xl mx-auto space-y-8 page-transition-enter page-transition-enter-active">
         {/* Score Display */}
-        <Card className="nova-card p-8 text-center">
+        <Card className="nova-card card-interactive p-8 text-center stagger-item">
           <div className="space-y-6">
             <div className="flex justify-center">
               <NovaScore score={result.score} size="lg" />
@@ -287,30 +349,30 @@ const NovaScoreForm: React.FC = () => {
         </Card>
 
         {/* Top Features Analysis */}
-        <Card className="nova-card p-6">
+        <Card className="nova-card p-6 stagger-item">
           <h4 className="text-xl font-semibold mb-6 flex items-center">
-            <Target className="w-6 h-6 mr-2 text-primary" />
+            <Target className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('target', 'pulse')}`} />
             Key Factors Influencing Your Score
           </h4>
           
           <div className="grid md:grid-cols-3 gap-4">
             {result.topFeatures.map((feature, index) => (
-              <div 
+              <div
                 key={index}
-                className={`p-4 rounded-lg border-l-4 ${
-                  feature.impact === 'positive' 
-                    ? 'border-success bg-success/5' 
+                className={`p-4 rounded-lg border-l-4 transition-all duration-300 hover:scale-105 hover:shadow-md stagger-item ${
+                  feature.impact === 'positive'
+                    ? 'border-success bg-success/5 hover:bg-success/10'
                     : feature.impact === 'negative'
-                    ? 'border-error bg-error/5'
-                    : 'border-warning bg-warning/5'
+                    ? 'border-error bg-error/5 hover:bg-error/10'
+                    : 'border-warning bg-warning/5 hover:bg-warning/10'
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
                   <h5 className="font-semibold text-sm">{feature.name}</h5>
                   {feature.impact === 'positive' ? (
-                    <CheckCircle className="w-4 h-4 text-success flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-success flex-shrink-0 icon-hover" />
                   ) : (
-                    <AlertCircle className="w-4 h-4 text-error flex-shrink-0" />
+                    <AlertCircle className="w-4 h-4 text-error flex-shrink-0 icon-hover" />
                   )}
                 </div>
                 <p className="text-xl font-bold mb-2">{feature.value}</p>
@@ -321,13 +383,26 @@ const NovaScoreForm: React.FC = () => {
         </Card>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button variant="nova" size="lg" onClick={resetForm}>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center stagger-item">
+          <Button
+            variant="nova"
+            size="lg"
+            onClick={() => {
+              triggerIconAnimation('reset', 'spin');
+              resetForm();
+            }}
+            className="group"
+          >
             Calculate Another Score
           </Button>
-          <Button variant="outline" size="lg">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => triggerIconAnimation('arrow', 'bounce')}
+            className="group"
+          >
             Apply for Financial Products
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <ArrowRight className={`w-5 h-5 ml-2 transition-transform group-hover:translate-x-1 ${getIconClasses('arrow', 'bounce')}`} />
           </Button>
         </div>
       </div>
@@ -335,7 +410,7 @@ const NovaScoreForm: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto page-transition-enter page-transition-enter-active">
       <div className="text-center mb-8 fade-in-up">
         <h3 className="text-3xl md:text-4xl font-bold mb-4 text-enhanced">
           Get Your <span className="text-gradient-primary">Nova Score</span>
@@ -345,29 +420,29 @@ const NovaScoreForm: React.FC = () => {
           All calculations are done securely and transparently.
         </p>
         
-        <Button 
-          variant="accent" 
+        <Button
+          variant="accent"
           onClick={loadDemoData}
-          className="mb-6"
+          className="mb-6 group"
         >
-          <Sparkles className="w-4 h-4 mr-2" />
+          <Sparkles className={`w-4 h-4 mr-2 transition-transform group-hover:rotate-12 ${getIconClasses('sparkles', 'spin')}`} />
           Use Demo Data
         </Button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
-        <Card className="nova-card p-6 slide-up">
+        <Card className="nova-card card-interactive p-6 slide-up stagger-item">
           <h4 className="text-xl font-bold mb-6 flex items-center text-enhanced">
-            <DollarSign className="w-6 h-6 mr-2 text-primary" />
+            <DollarSign className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('dollar', 'bounce')}`} />
             Basic Earnings Information
           </h4>
           
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-2">
+            <div className={`space-y-2 field-focus ${fieldErrors.has('monthly_earnings') ? 'field-error' : ''}`}>
               <Label htmlFor="monthly_earnings" className="flex items-center">
-                Monthly Earnings
-                <Info className="w-4 h-4 ml-1 text-muted-foreground" />
+                Monthly Earnings *
+                <Info className="w-4 h-4 ml-1 text-muted-foreground icon-hover" />
               </Label>
               <Input
                 id="monthly_earnings"
@@ -375,42 +450,42 @@ const NovaScoreForm: React.FC = () => {
                 placeholder="3500"
                 value={formData.monthly_earnings}
                 onChange={(e) => handleInputChange('monthly_earnings', e.target.value)}
-                className="text-lg"
+                className={`text-lg transition-all duration-200 ${fieldErrors.has('monthly_earnings') ? 'border-error ring-error/20' : ''}`}
                 required
               />
               <p className="text-sm text-muted-enhanced font-medium">Your typical monthly income from gig work</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="active_days">Active Days per Month</Label>
+            <div className={`space-y-2 field-focus ${fieldErrors.has('active_days_per_month') ? 'field-error' : ''}`}>
+              <Label htmlFor="active_days">Active Days per Month *</Label>
               <Input
                 id="active_days"
                 type="number"
                 placeholder="22"
                 value={formData.active_days_per_month}
                 onChange={(e) => handleInputChange('active_days_per_month', e.target.value)}
-                className="text-lg"
+                className={`text-lg transition-all duration-200 ${fieldErrors.has('active_days_per_month') ? 'border-error ring-error/20' : ''}`}
                 required
               />
               <p className="text-sm text-muted-enhanced font-medium">How many days you work in an average month</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="earnings_per_day">Earnings per Active Day</Label>
+            <div className={`space-y-2 field-focus ${fieldErrors.has('earnings_per_active_day') ? 'field-error' : ''}`}>
+              <Label htmlFor="earnings_per_day">Earnings per Active Day *</Label>
               <Input
                 id="earnings_per_day"
                 type="number"
                 placeholder="159"
                 value={formData.earnings_per_active_day}
                 onChange={(e) => handleInputChange('earnings_per_active_day', e.target.value)}
-                className="text-lg"
+                className={`text-lg transition-all duration-200 ${fieldErrors.has('earnings_per_active_day') ? 'border-error ring-error/20' : ''}`}
                 required
               />
               <p className="text-sm text-muted-enhanced font-medium">Average daily earnings when you work</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="cancellation_rate">Cancellation Rate (%)</Label>
+            <div className={`space-y-2 field-focus ${fieldErrors.has('cancellation_rate') ? 'field-error' : ''}`}>
+              <Label htmlFor="cancellation_rate">Cancellation Rate (%) *</Label>
               <Input
                 id="cancellation_rate"
                 type="number"
@@ -418,7 +493,7 @@ const NovaScoreForm: React.FC = () => {
                 placeholder="2.3"
                 value={formData.cancellation_rate}
                 onChange={(e) => handleInputChange('cancellation_rate', e.target.value)}
-                className="text-lg"
+                className={`text-lg transition-all duration-200 ${fieldErrors.has('cancellation_rate') ? 'border-error ring-error/20' : ''}`}
                 required
               />
               <p className="text-sm text-muted-enhanced font-medium">Percentage of jobs you've cancelled</p>
@@ -427,9 +502,9 @@ const NovaScoreForm: React.FC = () => {
         </Card>
 
         {/* Service Quality */}
-        <Card className="nova-card p-6 slide-up">
+        <Card className="nova-card card-interactive p-6 slide-up stagger-item">
           <h4 className="text-xl font-semibold mb-6 flex items-center">
-            <Star className="w-6 h-6 mr-2 text-primary" />
+            <Star className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('star', 'pulse')}`} />
             Service Quality
           </h4>
           
@@ -454,33 +529,35 @@ const NovaScoreForm: React.FC = () => {
         </Card>
 
         {/* Monthly Trends */}
-        <Card className="nova-card p-6 slide-up">
+        <Card className="nova-card card-interactive p-6 slide-up stagger-item">
           <h4 className="text-xl font-semibold mb-6 flex items-center">
-            <TrendingUp className="w-6 h-6 mr-2 text-primary" />
+            <TrendingUp className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('trending', 'bounce')}`} />
             Monthly Earnings Trends
           </h4>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="earnings_avg_6mo">6-Month Average</Label>
+            <div className={`space-y-2 field-focus ${fieldErrors.has('earnings_avg_6mo') ? 'field-error' : ''}`}>
+              <Label htmlFor="earnings_avg_6mo">6-Month Average *</Label>
               <Input
                 id="earnings_avg_6mo"
                 type="number"
                 placeholder="3400"
                 value={formData.earnings_avg_6mo}
                 onChange={(e) => handleInputChange('earnings_avg_6mo', e.target.value)}
+                className={`transition-all duration-200 ${fieldErrors.has('earnings_avg_6mo') ? 'border-error ring-error/20' : ''}`}
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="earnings_avg_3mo">3-Month Average</Label>
+            <div className={`space-y-2 field-focus ${fieldErrors.has('earnings_avg_3mo') ? 'field-error' : ''}`}>
+              <Label htmlFor="earnings_avg_3mo">3-Month Average *</Label>
               <Input
                 id="earnings_avg_3mo"
                 type="number"
                 placeholder="3600"
                 value={formData.earnings_avg_3mo}
                 onChange={(e) => handleInputChange('earnings_avg_3mo', e.target.value)}
+                className={`transition-all duration-200 ${fieldErrors.has('earnings_avg_3mo') ? 'border-error ring-error/20' : ''}`}
                 required
               />
             </div>
@@ -489,7 +566,7 @@ const NovaScoreForm: React.FC = () => {
           <div className="mt-6 grid md:grid-cols-3 gap-4">
             <h5 className="font-medium md:col-span-3 mb-2">Individual Month Earnings</h5>
             {[1, 2, 3, 4, 5, 6].map((month) => (
-              <div key={month} className="space-y-1">
+              <div key={month} className="space-y-1 field-focus">
                 <Label htmlFor={`earnings_m${month}`} className="text-sm">
                   Month {month} Ago
                 </Label>
@@ -499,7 +576,7 @@ const NovaScoreForm: React.FC = () => {
                   placeholder={month <= 3 ? "3600" : "3200"}
                   value={formData[`earnings_m${month}` as keyof FormData]}
                   onChange={(e) => handleInputChange(`earnings_m${month}` as keyof FormData, e.target.value)}
-                  className="text-sm"
+                  className="text-sm transition-all duration-200"
                   required
                 />
               </div>
@@ -508,14 +585,14 @@ const NovaScoreForm: React.FC = () => {
         </Card>
 
         {/* Activity Metrics */}
-        <Card className="nova-card p-6 slide-up">
+        <Card className="nova-card card-interactive p-6 slide-up stagger-item">
           <h4 className="text-xl font-semibold mb-6 flex items-center">
-            <Calendar className="w-6 h-6 mr-2 text-primary" />
+            <Calendar className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('calendar', 'spin')}`} />
             Activity Metrics
           </h4>
           
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-2">
+            <div className="space-y-2 field-focus">
               <Label htmlFor="trips_m4">Trips/Orders (4 Months Ago)</Label>
               <Input
                 id="trips_m4"
@@ -523,11 +600,12 @@ const NovaScoreForm: React.FC = () => {
                 placeholder="180"
                 value={formData.trips_m4}
                 onChange={(e) => handleInputChange('trips_m4', e.target.value)}
+                className="transition-all duration-200"
                 required
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 field-focus">
               <Label htmlFor="trips_m5">Trips/Orders (5 Months Ago)</Label>
               <Input
                 id="trips_m5"
@@ -535,6 +613,7 @@ const NovaScoreForm: React.FC = () => {
                 placeholder="190"
                 value={formData.trips_m5}
                 onChange={(e) => handleInputChange('trips_m5', e.target.value)}
+                className="transition-all duration-200"
                 required
               />
             </div>
@@ -542,23 +621,29 @@ const NovaScoreForm: React.FC = () => {
         </Card>
 
         {/* Submit Button */}
-        <div className="text-center">
+        <div className="text-center stagger-item">
           <Button
             type="submit"
             variant="hero"
             size="xl"
             disabled={isLoading}
-            className="min-w-64"
+            className="min-w-64 group"
+            onClick={() => !isLoading && triggerIconAnimation('calculate', 'spin')}
           >
             {isLoading ? (
-              <>
+              <div className="flex items-center">
                 <LoadingSpinner size="sm" className="mr-2 text-white" />
+                <span className="loading-dots mr-2">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
                 Calculating Your Nova Score...
-              </>
+              </div>
             ) : (
               <>
                 Calculate My Nova Score
-                <ArrowRight className="w-6 h-6 ml-2" />
+                <ArrowRight className={`w-6 h-6 ml-2 transition-transform group-hover:translate-x-1 ${getIconClasses('calculate', 'spin')}`} />
               </>
             )}
           </Button>

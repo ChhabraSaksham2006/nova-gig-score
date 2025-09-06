@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card';
 import NovaScore from '@/components/NovaScore';
 import FeatureCard from '@/components/FeatureCard';
 import NovaScoreForm from '@/components/NovaScoreForm';
+import NovaComparison from '@/components/NovaComparison';
+import NovaFAQ from '@/components/NovaFAQ';
 import Header from '@/components/Header';
 import BackToTop from '@/components/BackToTop';
 import LazyImage from '@/components/LazyImage';
@@ -242,6 +244,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Nova Comparison Section */}
+      <NovaComparison />
+
       {/* Interactive Demo Section */}
       <section id="nova-score-form" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4">
@@ -291,6 +296,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <NovaFAQ />
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-primary text-primary-foreground">
