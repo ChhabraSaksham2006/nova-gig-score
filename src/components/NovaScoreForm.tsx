@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import NovaScore from '@/components/NovaScore';
-import { 
-  Star, 
-  DollarSign, 
-  Calendar, 
-  TrendingUp, 
+import LoadingSpinner from '@/components/LoadingSpinner';
+import {
+  Star,
+  DollarSign,
+  Calendar,
+  TrendingUp,
   Info,
   Sparkles,
   ArrowRight,
@@ -278,7 +279,7 @@ const NovaScoreForm: React.FC = () => {
               <h3 className="text-2xl font-bold text-gradient-primary">
                 Your Nova Score Results
               </h3>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg text-muted-enhanced max-w-2xl mx-auto font-medium">
                 {result.recommendation}
               </p>
             </div>
@@ -336,11 +337,11 @@ const NovaScoreForm: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8 fade-in-up">
-        <h3 className="text-3xl md:text-4xl font-bold mb-4">
+        <h3 className="text-3xl md:text-4xl font-bold mb-4 text-enhanced">
           Get Your <span className="text-gradient-primary">Nova Score</span>
         </h3>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-          Enter your gig work details to receive your personalized Nova Score. 
+        <p className="text-lg text-muted-enhanced max-w-2xl mx-auto mb-6 font-medium">
+          Enter your gig work details to receive your personalized Nova Score.
           All calculations are done securely and transparently.
         </p>
         
@@ -357,7 +358,7 @@ const NovaScoreForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
         <Card className="nova-card p-6 slide-up">
-          <h4 className="text-xl font-semibold mb-6 flex items-center">
+          <h4 className="text-xl font-bold mb-6 flex items-center text-enhanced">
             <DollarSign className="w-6 h-6 mr-2 text-primary" />
             Basic Earnings Information
           </h4>
@@ -377,7 +378,7 @@ const NovaScoreForm: React.FC = () => {
                 className="text-lg"
                 required
               />
-              <p className="text-sm text-muted-foreground">Your typical monthly income from gig work</p>
+              <p className="text-sm text-muted-enhanced font-medium">Your typical monthly income from gig work</p>
             </div>
 
             <div className="space-y-2">
@@ -391,7 +392,7 @@ const NovaScoreForm: React.FC = () => {
                 className="text-lg"
                 required
               />
-              <p className="text-sm text-muted-foreground">How many days you work in an average month</p>
+              <p className="text-sm text-muted-enhanced font-medium">How many days you work in an average month</p>
             </div>
 
             <div className="space-y-2">
@@ -405,7 +406,7 @@ const NovaScoreForm: React.FC = () => {
                 className="text-lg"
                 required
               />
-              <p className="text-sm text-muted-foreground">Average daily earnings when you work</p>
+              <p className="text-sm text-muted-enhanced font-medium">Average daily earnings when you work</p>
             </div>
 
             <div className="space-y-2">
@@ -420,7 +421,7 @@ const NovaScoreForm: React.FC = () => {
                 className="text-lg"
                 required
               />
-              <p className="text-sm text-muted-foreground">Percentage of jobs you've cancelled</p>
+              <p className="text-sm text-muted-enhanced font-medium">Percentage of jobs you've cancelled</p>
             </div>
           </div>
         </Card>
@@ -551,7 +552,7 @@ const NovaScoreForm: React.FC = () => {
           >
             {isLoading ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                <LoadingSpinner size="sm" className="mr-2 text-white" />
                 Calculating Your Nova Score...
               </>
             ) : (

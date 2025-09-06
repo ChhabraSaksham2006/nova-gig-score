@@ -4,12 +4,15 @@ import { Card } from '@/components/ui/card';
 import NovaScore from '@/components/NovaScore';
 import FeatureCard from '@/components/FeatureCard';
 import NovaScoreForm from '@/components/NovaScoreForm';
-import { 
-  TrendingUp, 
-  Shield, 
-  Star, 
-  CreditCard, 
-  Users, 
+import Header from '@/components/Header';
+import BackToTop from '@/components/BackToTop';
+import LazyImage from '@/components/LazyImage';
+import {
+  TrendingUp,
+  Shield,
+  Star,
+  CreditCard,
+  Users,
   Brain,
   CheckCircle,
   ArrowRight,
@@ -30,6 +33,21 @@ const Index = () => {
   const handleDemoScore = () => {
     const newScore = Math.floor(Math.random() * 40) + 60; // Random score between 60-100
     setDemoScore(newScore);
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const scrollToNovaScoreForm = () => {
+    scrollToSection('nova-score-form');
+  };
+
+  const scrollToHowItWorks = () => {
+    scrollToSection('how-it-works');
   };
 
   const features = [
@@ -74,8 +92,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header */}
+      <Header onNavigate={scrollToSection} />
+      
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${heroImage})` }}
@@ -85,41 +106,42 @@ const Index = () => {
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto slide-up">
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              Unlock Financial 
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 hero-text">
+              Unlock Financial
               <span className="text-gradient-hero block">Opportunity</span>
               for the Gig Economy
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Meet Nova Score: The AI-powered credit scoring revolution built for drivers, 
+            <p className="text-xl md:text-2xl text-gray-100 mb-8 max-w-3xl mx-auto hero-subtitle font-medium">
+              Meet Nova Score: The AI-powered credit scoring revolution built for drivers,
               riders, freelancers, and gig entrepreneurs—beyond traditional credit checks.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center slide-up-delay">
-              <Button variant="hero" size="xl" onClick={handleDemoScore}>
+              <Button
+                variant="hero"
+                size="xl"
+                onClick={scrollToNovaScoreForm}
+                className="focus-visible:focus-visible btn-enhanced"
+                aria-label="Navigate to Nova Score calculation form"
+              >
                 Get Your Nova Score
-                <ArrowRight className="w-6 h-6 ml-2" />
+                <ArrowRight className="w-6 h-6 ml-2" aria-hidden="true" />
               </Button>
               
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="xl"
-                className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
-                onClick={() => setIsPlaying(true)}
+                className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm focus-visible:focus-visible btn-enhanced"
+                onClick={scrollToHowItWorks}
+                aria-label="Learn how Nova Score works"
               >
-                <Play className="w-5 h-5 mr-2" />
+                <Play className="w-5 h-5 mr-2" aria-hidden="true" />
                 How It Works
               </Button>
             </div>
           </div>
 
-          {/* Floating Nova Score Demo */}
-          <div className="absolute right-10 top-1/2 transform -translate-y-1/2 floating hidden lg:block">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-              <NovaScore score={demoScore} size="md" />
-            </div>
-          </div>
         </div>
 
         {/* Scroll Indicator */}
@@ -131,26 +153,26 @@ const Index = () => {
       </section>
 
       {/* What is Nova Section */}
-      <section className="py-20 bg-gradient-to-br from-background to-muted/20">
+      <section id="about-nova" className="py-20 bg-gradient-to-br from-background to-muted/20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="fade-in-up">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                  What is 
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-enhanced">
+                  What is
                   <span className="text-gradient-primary"> Project Nova</span>?
                 </h2>
                 
-                <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  Project Nova is transforming the future of financial inclusion. Our AI-driven 
-                  Equitable Credit Scoring Engine empowers gig economy workers—those too often 
-                  excluded by standard credit systems—to access fair loans, micro-advances, and 
+                <p className="text-lg text-muted-enhanced mb-6 leading-relaxed">
+                  Project Nova is transforming the future of financial inclusion. Our AI-driven
+                  Equitable Credit Scoring Engine empowers gig economy workers—those too often
+                  excluded by standard credit systems—to access fair loans, micro-advances, and
                   insurance products.
                 </p>
                 
-                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                  Nova Score doesn't rely on old-school credit reports. Instead, it reads the 
-                  true story of your earnings, reliability, and customer feedback to build an 
+                <p className="text-lg text-muted-enhanced mb-8 leading-relaxed">
+                  Nova Score doesn't rely on old-school credit reports. Instead, it reads the
+                  true story of your earnings, reliability, and customer feedback to build an
                   accurate, bias-aware credit profile—instantly and transparently.
                 </p>
 
@@ -162,25 +184,31 @@ const Index = () => {
                         <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center flex-shrink-0">
                           <Icon className="w-4 h-4 text-white" />
                         </div>
-                        <span className="text-sm font-medium">{benefit.text}</span>
+                        <span className="text-sm font-semibold text-enhanced">{benefit.text}</span>
                       </div>
                     );
                   })}
                 </div>
 
-                <Button variant="nova" size="lg">
+                <Button
+                  variant="nova"
+                  size="lg"
+                  onClick={scrollToHowItWorks}
+                  className="focus-visible:focus-visible btn-enhanced"
+                  aria-label="Learn more about how Nova Score works"
+                >
                   Learn More About Nova
-                  <BarChart3 className="w-5 h-5 ml-2" />
+                  <BarChart3 className="w-5 h-5 ml-2" aria-hidden="true" />
                 </Button>
               </div>
 
               <div className="relative fade-in-up">
-                <img 
-                  src={aiNetworkImage} 
-                  alt="AI Network Visualization" 
-                  className="w-full max-w-md mx-auto floating"
+                <LazyImage
+                  src={aiNetworkImage}
+                  alt="AI Network Visualization"
+                  className="w-full max-w-md mx-auto rounded-3xl"
                 />
-                <div className="absolute inset-0 bg-gradient-primary/10 rounded-3xl"></div>
+                <div className="absolute inset-0 bg-gradient-primary/10 rounded-3xl pointer-events-none"></div>
               </div>
             </div>
           </div>
@@ -188,14 +216,14 @@ const Index = () => {
       </section>
 
       {/* How Nova Score Works */}
-      <section className="py-20 bg-muted/30">
+      <section id="how-it-works" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 fade-in-up">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-enhanced">
               How <span className="text-gradient-primary">Nova Score</span> Works
             </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Nova Score leverages real-time operational and behavioral data to create a unique, 
+            <p className="text-lg text-muted-enhanced max-w-3xl mx-auto">
+              Nova Score leverages real-time operational and behavioral data to create a unique,
               data-driven risk score (0-100) that accurately reflects your financial reliability.
             </p>
           </div>
@@ -215,7 +243,7 @@ const Index = () => {
       </section>
 
       {/* Interactive Demo Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
+      <section id="nova-score-form" className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4">
           <NovaScoreForm />
         </div>
@@ -226,11 +254,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <div className="fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-enhanced">
                 <span className="text-gradient-primary">Fairness & Ethics</span> Commitment
               </h2>
-              <p className="text-lg text-muted-foreground mb-12">
-                Nova Score is built with equity at its core, ensuring transparent, 
+              <p className="text-lg text-muted-enhanced mb-12">
+                Nova Score is built with equity at its core, ensuring transparent,
                 bias-audited AI that democratizes access to financial growth.
               </p>
             </div>
@@ -238,24 +266,24 @@ const Index = () => {
             <div className="grid md:grid-cols-3 gap-8 fade-in-up">
               <Card className="nova-card p-6 text-center">
                 <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-3">Bias Detection</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3 text-enhanced">Bias Detection</h3>
+                <p className="text-muted-enhanced">
                   Advanced bias detection and mitigation algorithms baked into every assessment.
                 </p>
               </Card>
 
               <Card className="nova-card p-6 text-center">
                 <Globe className="w-12 h-12 text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-3">Inclusive Design</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3 text-enhanced">Inclusive Design</h3>
+                <p className="text-muted-enhanced">
                   Sensitive attributes excluded from model training to ensure fair outcomes.
                 </p>
               </Card>
 
               <Card className="nova-card p-6 text-center">
                 <Award className="w-12 h-12 text-primary mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-3">Transparency</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-xl font-bold mb-3 text-enhanced">Transparency</h3>
+                <p className="text-muted-enhanced">
                   Fully documented and auditable process with SHAP-based explainability.
                 </p>
               </Card>
@@ -268,30 +296,34 @@ const Index = () => {
       <section className="py-20 bg-gradient-primary text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto fade-in-up">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 hero-text">
               Ready to Unlock Your Financial Potential?
             </h2>
-            <p className="text-xl mb-8 opacity-90">
-              Join thousands of gig workers who have already discovered their Nova Score. 
+            <p className="text-xl mb-8 opacity-95 font-medium hero-subtitle">
+              Join thousands of gig workers who have already discovered their Nova Score.
               Start your journey to better financial opportunities today.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="xl"
-                className="border-white text-white hover:bg-white hover:text-primary"
+                className="border-white text-white hover:bg-white hover:text-primary focus-visible:focus-visible btn-enhanced"
+                onClick={scrollToNovaScoreForm}
+                aria-label="Apply for early access to Nova Score"
               >
                 Apply for Early Access
               </Button>
               
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 size="xl"
-                className="bg-white text-primary hover:bg-white/90"
+                className="bg-white text-primary hover:bg-white/90 focus-visible:focus-visible btn-enhanced"
+                onClick={() => window.open('https://github.com', '_blank')}
+                aria-label="View Project Nova on GitHub (opens in new tab)"
               >
                 View on GitHub
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
               </Button>
             </div>
           </div>
@@ -305,23 +337,26 @@ const Index = () => {
             <h3 className="text-2xl font-bold text-gradient-primary mb-4">
               Project Nova
             </h3>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-enhanced mb-6 font-medium">
               Financial inclusion through fair, data-driven credit scoring.
             </p>
             
-            <div className="flex justify-center space-x-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-primary transition-colors">Contact</a>
-              <a href="#" className="hover:text-primary transition-colors">Blog</a>
-              <a href="#" className="hover:text-primary transition-colors">Ethics</a>
-              <a href="#" className="hover:text-primary transition-colors">GitHub</a>
+            <div className="flex justify-center space-x-6 text-sm text-muted-enhanced font-medium">
+              <a href="#" className="hover:text-primary transition-colors focus-visible:focus-visible">Contact</a>
+              <a href="#" className="hover:text-primary transition-colors focus-visible:focus-visible">Blog</a>
+              <a href="#" className="hover:text-primary transition-colors focus-visible:focus-visible">Ethics</a>
+              <a href="#" className="hover:text-primary transition-colors focus-visible:focus-visible">GitHub</a>
             </div>
             
-            <div className="mt-8 pt-8 border-t border-border text-sm text-muted-foreground">
+            <div className="mt-8 pt-8 border-t border-border text-sm text-muted-enhanced font-medium">
               © 2024 Project Nova. Building fair financial access for everyone.
             </div>
           </div>
         </div>
       </footer>
+      
+      {/* Back to Top Button */}
+      <BackToTop />
     </div>
   );
 };

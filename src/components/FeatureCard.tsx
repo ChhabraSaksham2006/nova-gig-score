@@ -27,10 +27,10 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         </div>
         
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-bold text-enhanced mb-2">
             {title}
           </h3>
-          <p className="text-muted-foreground leading-relaxed">
+          <p className="text-muted-enhanced leading-relaxed font-medium">
             {description}
           </p>
         </div>

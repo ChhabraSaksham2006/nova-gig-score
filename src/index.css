@@ -10,7 +10,7 @@ All colors MUST be HSL for consistent theming.
   :root {
     /* Core Brand Colors - Grab Singapore Theme */
     --background: 0 0% 100%;
-    --foreground: 220 9% 15%;
+    --foreground: 220 15% 8%;
 
     /* Grab Signature Green */
     --grab-green: 142 76% 36%;
@@ -23,29 +23,29 @@ All colors MUST be HSL for consistent theming.
     --primary-hover: 142 76% 32%;
 
     --secondary: 220 9% 96%;
-    --secondary-foreground: 220 9% 15%;
+    --secondary-foreground: 220 15% 8%;
 
     --accent: 39 100% 50%;
-    --accent-foreground: 220 9% 15%;
+    --accent-foreground: 220 15% 8%;
 
     /* Fintech UI Colors */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
-    --warning: 39 100% 50%;
-    --warning-foreground: 220 9% 15%;
+    --warning: 39 100% 45%;
+    --warning-foreground: 0 0% 98%;
     --error: 0 84% 60%;
     --error-foreground: 0 0% 98%;
 
     /* Surface Colors */
     --card: 0 0% 100%;
-    --card-foreground: 220 9% 15%;
+    --card-foreground: 220 15% 8%;
     --card-hover: 220 9% 98%;
 
     --muted: 220 9% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted-foreground: 220 15% 35%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 9% 15%;
+    --popover-foreground: 220 15% 8%;
 
     /* Interactive Elements */
     --border: 220 9% 91%;
@@ -83,24 +83,34 @@ All colors MUST be HSL for consistent theming.
   }
 
   .dark {
-    /* Dark theme updates */
-    --primary: 142 76% 45%;
-    --grab-green: 142 76% 45%;
-    --background: 220 9% 8%;
-    --foreground: 0 0% 95%;
-    --card: 220 9% 12%;
-    --card-foreground: 0 0% 95%;
+    /* Dark theme updates - Enhanced visibility */
+    --primary: 142 76% 55%;
+    --grab-green: 142 76% 55%;
+    --background: 220 15% 6%;
+    --foreground: 0 0% 98%;
+    --card: 220 15% 12%;
+    --card-foreground: 0 0% 98%;
+    --card-hover: 220 15% 16%;
     
-    /* Override old dark theme */
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* Enhanced dark theme colors with better contrast */
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 15% 16%;
+    --muted-foreground: 220 8% 88%;
+    --accent: 220 15% 18%;
+    --accent-foreground: 0 0% 98%;
+    --border: 220 15% 24%;
+    --input: 220 15% 20%;
+    --ring: 142 76% 55%;
+    
+    /* Status colors for dark mode - improved visibility */
+    --success: 142 76% 55%;
+    --warning: 39 100% 65%;
+    --error: 0 84% 75%;
+    
+    /* Popover colors for dark mode */
+    --popover: 220 15% 12%;
+    --popover-foreground: 0 0% 98%;
     
     /* Sidebar dark theme */
     --sidebar-background: 240 5.9% 10%;
@@ -122,10 +132,113 @@ All colors MUST be HSL for consistent theming.
   body {
     @apply bg-background text-foreground overflow-x-hidden;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Enhanced text visibility */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  /* Hero text with better visibility */
+  .hero-text {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-weight: 800;
+  }
+
+  .hero-subtitle {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    font-weight: 500;
+  }
+
+  /* Improved text contrast */
+  .text-enhanced {
+    color: hsl(var(--foreground));
+    font-weight: 500;
+  }
+
+  .text-muted-enhanced {
+    color: hsl(var(--muted-foreground));
+    font-weight: 500;
+  }
+
+  /* Dark mode specific text enhancements - improved visibility */
+  .dark .text-enhanced {
+    color: hsl(0 0% 98%);
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .dark .text-muted-enhanced {
+    color: hsl(220 8% 88%);
+    font-weight: 600;
+  }
+
+  .dark .hero-text {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    font-weight: 900;
+    color: hsl(0 0% 98%);
+  }
+
+  .dark .hero-subtitle {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    font-weight: 600;
+    color: hsl(0 0% 95%);
+  }
+
+  /* Enhanced button text for dark mode */
+  .dark .btn-enhanced {
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Dark mode card improvements */
+  .dark .nova-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  .dark .nova-card:hover {
+    background: hsl(var(--card-hover));
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Dark mode form input improvements */
+  .dark input[type="text"],
+  .dark input[type="number"],
+  .dark input[type="email"],
+  .dark textarea,
+  .dark select {
+    background: hsl(var(--input));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+
+  .dark input[type="text"]:focus,
+  .dark input[type="number"]:focus,
+  .dark input[type="email"]:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
+  }
+
+  /* Dark mode button improvements */
+  .dark .nova-button {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+
+  .dark .nova-button:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -316,4 +429,218 @@ All colors MUST be HSL for consistent theming.
   .nova-card:hover {
     transform: translateY(-2px);
   }
+  
+  .floating {
+    animation: none;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .slide-up,
+  .slide-up-delay,
+  .fade-in-up,
+  .floating {
+    animation: none;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Focus styles for better accessibility */
+.focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .text-gradient-primary,
+  .text-gradient-hero {
+    background: none;
+    color: hsl(var(--primary));
+    font-weight: 700;
+  }
+  
+  /* Enhanced contrast for all text */
+  body {
+    --foreground: 0 0% 0%;
+    --muted-foreground: 0 0% 20%;
+  }
+  
+  .dark body {
+    --foreground: 0 0% 100%;
+    --muted-foreground: 0 0% 95%;
+    --background: 220 15% 3%;
+    --card: 220 15% 8%;
+    --border: 220 15% 30%;
+  }
+  
+  /* Enhanced dark mode text visibility */
+  .dark .text-enhanced {
+    color: hsl(0 0% 100%) !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  
+  .dark .text-muted-enhanced {
+    color: hsl(0 0% 95%) !important;
+    font-weight: 600 !important;
+  }
+  
+  /* Stronger borders and outlines */
+  .nova-card {
+    border-width: 2px;
+  }
+  
+  .dark .nova-card {
+    border-width: 2px;
+    border-color: hsl(var(--border));
+  }
+}
+
+/* Better text rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Enhanced button text visibility */
+.btn-enhanced {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Loading skeleton animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground) / 0.1) 50%, hsl(var(--muted)) 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* Dark mode gradient improvements */
+.dark .hero-gradient {
+  background: linear-gradient(135deg, hsl(142 76% 25%) 0%, hsl(39 100% 35%) 100%);
+}
+
+.dark .card-gradient {
+  background: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(220 15% 14%) 100%);
+}
+
+/* Dark mode shadow improvements */
+.dark .shadow-green {
+  box-shadow: 0 8px 25px hsl(142 76% 25% / 0.3);
+}
+
+.dark .shadow-accent {
+  box-shadow: 0 8px 25px hsl(39 100% 35% / 0.3);
+}
+
+/* Dark mode skeleton loading */
+.dark .skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(220 15% 20%) 50%, hsl(var(--muted)) 75%);
+  background-size: 200px 100%;
+}
+
+/* Dark mode focus improvements */
+.dark .focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.2);
+}
+
+/* Dark mode link improvements */
+.dark a {
+  color: hsl(var(--primary));
+}
+
+.dark a:hover {
+  color: hsl(142 76% 65%);
+}
+
+/* Dark mode slider improvements */
+.dark [data-radix-slider-track] {
+  background-color: hsl(var(--muted));
+}
+
+.dark [data-radix-slider-range] {
+  background-color: hsl(var(--primary));
+}
+
+.dark [data-radix-slider-thumb] {
+  background-color: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark mode score meter improvements */
+.dark .score-meter {
+  background: conic-gradient(
+    from 0deg,
+    hsl(0 84% 75%) 0deg,
+    hsl(39 100% 65%) 120deg,
+    hsl(142 76% 55%) 240deg,
+    hsl(142 76% 55%) 360deg
+  );
+}
+
+/* Dark mode text gradient fallbacks */
+.dark .text-gradient-primary {
+  background: linear-gradient(135deg, hsl(142 76% 55%), hsl(142 76% 65%));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.dark .text-gradient-hero {
+  background: linear-gradient(135deg, hsl(142 76% 55%) 0%, hsl(39 100% 65%) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Dark mode feature icon improvements */
+.dark .feature-icon {
+  background: linear-gradient(135deg, hsl(142 76% 55%), hsl(142 76% 65%));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Dark mode mobile menu improvements */
+.dark .mobile-menu {
+  background: hsl(var(--background) / 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid hsl(var(--border));
+}
+
+/* Dark mode toast improvements */
+.dark [data-sonner-toast] {
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark [data-sonner-toast][data-type="success"] {
+  background: hsl(var(--success) / 0.1) !important;
+  border-color: hsl(var(--success)) !important;
+}
+
+.dark [data-sonner-toast][data-type="error"] {
+  background: hsl(var(--error) / 0.1) !important;
+  border-color: hsl(var(--error)) !important;
 }

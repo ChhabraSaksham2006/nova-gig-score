@@ -67,14 +67,15 @@ const NovaScore: React.FC<NovaScoreProps> = ({
   const strokeWidth = size === 'lg' ? 8 : size === 'md' ? 6 : 4;
   const radius = size === 'lg' ? 88 : size === 'md' ? 58 : 36;
   const circumference = 2 * Math.PI * radius;
-  const strokeDasharray = `${(displayScore / 100) * circumference} ${circumference}`;
+  const progressLength = (displayScore / 100) * circumference;
+  const strokeDasharray = `${progressLength} ${circumference - progressLength}`;
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <div className={`relative ${sizeClasses[size]} flex items-center justify-center`}>
+      <div className={`relative ${sizeClasses[size]}`}>
         {/* Background Circle */}
-        <svg 
-          className="absolute inset-0 w-full h-full transform -rotate-90"
+        <svg
+          className="w-full h-full transform -rotate-90"
           viewBox="0 0 200 200"
         >
           <circle
@@ -90,7 +91,9 @@ const NovaScore: React.FC<NovaScoreProps> = ({
             cx="100"
             cy="100"
             r={radius}
-            stroke={`hsl(var(--${getScoreColor(displayScore)}))`}
+            stroke={getScoreColor(displayScore) === 'success' ? 'hsl(var(--success))' :
+                   getScoreColor(displayScore) === 'warning' ? 'hsl(var(--warning))' :
+                   'hsl(var(--error))'}
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={strokeDasharray}
@@ -102,16 +105,22 @@ const NovaScore: React.FC<NovaScoreProps> = ({
           />
         </svg>
         
-        {/* Score Display */}
-        <div className={`z-10 font-bold ${sizeClasses[size]} text-center`}>
-          <div className="text-gradient-primary">{Math.round(displayScore)}</div>
-          <div className="text-xs text-muted-foreground -mt-1">/ 100</div>
+        {/* Score Display - Absolutely positioned and centered */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className={`font-bold text-center ${size === 'lg' ? 'text-4xl' : size === 'md' ? 'text-2xl' : 'text-lg'}`}>
+            <div className="text-gradient-primary leading-none">{Math.round(displayScore)}</div>
+            <div className={`text-muted-foreground leading-none ${size === 'lg' ? 'text-sm' : 'text-xs'}`}>/ 100</div>
+          </div>
         </div>
       </div>
 
       {/* Score Label */}
       <div className="text-center">
-        <div className={`font-semibold text-${getScoreColor(displayScore)}`}>
+        <div className={`font-semibold ${
+          getScoreColor(displayScore) === 'success' ? 'text-success' :
+          getScoreColor(displayScore) === 'warning' ? 'text-warning' :
+          'text-error'
+        }`}>
           {getScoreLabel(displayScore)}
         </div>
         <div className="text-sm text-muted-foreground">Nova Score</div>

@@ -1,73 +1,89 @@
-# Welcome to your Lovable project
+# Nova Gig Score
 
-## Project info
+A modern React application built with TypeScript and Vite for calculating and managing gig scores.
 
-**URL**: https://lovable.dev/projects/977316d0-ea22-4518-bf7e-2ad587e3ef45
+## Getting Started
 
-## How can I edit this code?
+### Prerequisites
 
-There are several ways of editing your application.
+- Node.js (v16 or higher)
+- npm or yarn package manager
 
-**Use Lovable**
+### Installation
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/977316d0-ea22-4518-bf7e-2ad587e3ef45) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+1. Clone the repository:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
+cd nova-gig-score
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies:
+```sh
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start the development server:
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Available Scripts
 
-**Use GitHub Codespaces**
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build in development mode
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+## Technology Stack
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Vite** - Fast build tool and development server
+- **React 18** - UI library
+- **TypeScript** - Type-safe JavaScript
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Modern UI components
+- **React Hook Form** - Form handling
+- **React Router** - Client-side routing
+- **Radix UI** - Accessible component primitives
 
-## How can I deploy this project?
+## Project Structure
 
-Simply open [Lovable](https://lovable.dev/projects/977316d0-ea22-4518-bf7e-2ad587e3ef45) and click on Share -> Publish.
+```
+src/
+├── components/     # Reusable UI components
+├── pages/         # Page components
+├── hooks/         # Custom React hooks
+├── lib/           # Utility functions
+└── assets/        # Static assets
+```
 
-## Can I connect a custom domain to my Lovable project?
+## Development
 
-Yes, you can!
+### Code Style
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+This project uses ESLint for code linting. Run `npm run lint` to check for issues.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### Building
+
+To build the project for production:
+
+```sh
+npm run build
+```
+
+The built files will be in the `dist` directory.
+
+## Deployment
+
+You can deploy this application to any static hosting service like:
+
+- Vercel
+- Netlify
+- GitHub Pages
+- AWS S3 + CloudFront
+
+Simply build the project and upload the `dist` folder contents.
