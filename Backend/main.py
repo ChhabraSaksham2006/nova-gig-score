@@ -61,21 +61,23 @@ async def startup_event():
 
 class NovaScoreRequest(BaseModel):
     """Request model for Nova Score calculation"""
-    monthly_earnings: float = Field(..., description="Monthly earnings from gig work", ge=0)
+    monthly_earnings: float = Field(..., description="Monthly earnings from gig work in INR", ge=0)
     active_days_per_month: int = Field(..., description="Number of active working days per month", ge=1, le=31)
     avg_rating: float = Field(..., description="Average customer rating", ge=1.0, le=5.0)
-    earnings_avg_6mo: float = Field(..., description="6-month average earnings", ge=0)
-    earnings_avg_3mo: float = Field(..., description="3-month average earnings", ge=0)
-    earnings_per_active_day: float = Field(..., description="Average earnings per active day", ge=0)
-    earnings_m1: float = Field(..., description="Earnings from 1 month ago", ge=0)
-    earnings_m2: float = Field(..., description="Earnings from 2 months ago", ge=0)
-    earnings_m3: float = Field(..., description="Earnings from 3 months ago", ge=0)
-    earnings_m4: float = Field(..., description="Earnings from 4 months ago", ge=0)
-    earnings_m5: float = Field(..., description="Earnings from 5 months ago", ge=0)
-    earnings_m6: float = Field(..., description="Earnings from 6 months ago", ge=0)
+    earnings_avg_6mo: float = Field(..., description="6-month average earnings in INR", ge=0)
+    earnings_avg_3mo: float = Field(..., description="3-month average earnings in INR", ge=0)
+    earnings_per_active_day: float = Field(..., description="Average earnings per active day in INR", ge=0)
+    earnings_m1: float = Field(..., description="Earnings from 1 month ago in INR", ge=0)
+    earnings_m2: float = Field(..., description="Earnings from 2 months ago in INR", ge=0)
+    earnings_m3: float = Field(..., description="Earnings from 3 months ago in INR", ge=0)
+    earnings_m4: float = Field(..., description="Earnings from 4 months ago in INR", ge=0)
+    earnings_m5: float = Field(..., description="Earnings from 5 months ago in INR", ge=0)
+    earnings_m6: float = Field(..., description="Earnings from 6 months ago in INR", ge=0)
     trips_m4: int = Field(..., description="Number of trips 4 months ago", ge=0)
     trips_m5: int = Field(..., description="Number of trips 5 months ago", ge=0)
     cancellation_rate: float = Field(..., description="Cancellation rate percentage", ge=0, le=100)
+    city: str = Field(..., description="Primary working city")
+    vehicle_type: str = Field(..., description="Vehicle type used for gig work")
 
 class FeatureImportance(BaseModel):
     """Feature importance for explanation"""
@@ -84,6 +86,13 @@ class FeatureImportance(BaseModel):
     impact: str
     explanation: str
 
+class LoanGiverRanges(BaseModel):
+    """Loan giver score ranges"""
+    excellent: str
+    good: str
+    fair: str
+    poor: str
+
 class NovaScoreResponse(BaseModel):
     """Response model for Nova Score calculation"""
     score: float
@@ -91,6 +100,8 @@ class NovaScoreResponse(BaseModel):
     recommendation: str
     top_features: List[FeatureImportance]
     model_confidence: float
+    suggestions: List[str]
+    loan_giver_ranges: LoanGiverRanges
 
 def calculate_derived_features(data: Dict[str, Any]) -> Dict[str, Any]:
     """Calculate derived features that the model expects"""
@@ -134,6 +145,17 @@ def calculate_derived_features(data: Dict[str, Any]) -> Dict[str, Any]:
         if month not in data:
             data[month] = avg_trips_recent
     
+    # Handle categorical features (city and vehicle_type)
+    # One-hot encode city
+    cities = ['Delhi', 'Mumbai', 'Bengaluru', 'Chennai', 'Kolkata']
+    for city in cities:
+        data[f'city_{city}'] = 1 if data.get('city') == city else 0
+    
+    # One-hot encode vehicle_type
+    vehicles = ['Auto', 'Bike', 'Car']
+    for vehicle in vehicles:
+        data[f'vehicle_type_{vehicle}'] = 1 if data.get('vehicle_type') == vehicle else 0
+    
     return data
 
 def prepare_features(request_data: Dict[str, Any]) -> np.ndarray:
@@ -173,11 +195,59 @@ def get_risk_level(score: float) -> str:
 def generate_recommendation(score: float, risk_level: str) -> str:
     """Generate recommendation based on score and risk level"""
     if risk_level == "low":
-        return "Excellent creditworthiness! You qualify for premium financial products with the best rates and terms."
+        return "Excellent creditworthiness! You qualify for premium financial products with the best rates and terms in the Indian market."
     elif risk_level == "medium":
-        return "Good credit profile with solid earning potential. Consider increasing consistency to access better rates."
+        return "Good credit profile with solid earning potential. Consider increasing consistency to access better rates from Indian lenders."
     else:
-        return "Credit profile shows potential but needs improvement. Focus on earnings stability and reducing cancellations."
+        return "Credit profile shows potential but needs improvement. Focus on earnings stability and reducing cancellations to access better financial opportunities."
+
+def generate_suggestions(data: Dict[str, Any], score: float) -> List[str]:
+    """Generate personalized suggestions for improvement"""
+    suggestions = []
+    
+    monthly_earnings = data.get('monthly_earnings', 0)
+    cancellation_rate = data.get('cancellation_rate', 0)
+    avg_rating = data.get('avg_rating', 0)
+    active_days = data.get('active_days_per_month', 0)
+    earnings_per_day = data.get('earnings_per_active_day', 0)
+    
+    if monthly_earnings < 20000:
+        suggestions.append("Increase your monthly earnings by working more active days or optimizing your routes for higher efficiency. Target ₹20,000+ monthly.")
+    
+    if cancellation_rate > 3:
+        suggestions.append("Reduce your cancellation rate by better planning and accepting only orders you can complete. Aim for under 3%.")
+    
+    if avg_rating < 4.5:
+        suggestions.append("Improve customer service to boost your ratings - be punctual, polite, and maintain vehicle cleanliness. Target 4.5+ rating.")
+    
+    if active_days < 20:
+        suggestions.append("Increase your active working days to show more consistency and reliability to lenders. Aim for 20+ days per month.")
+    
+    if earnings_per_day < 1000:
+        suggestions.append("Focus on peak hours and high-demand areas to increase your daily earnings efficiency. Target ₹1,000+ per day.")
+    
+    # City-specific suggestions
+    city = data.get('city', '')
+    if city in ['Mumbai', 'Delhi', 'Bengaluru']:
+        suggestions.append(f"Leverage {city}'s high-demand areas during peak hours to maximize earnings potential.")
+    
+    # Vehicle-specific suggestions
+    vehicle = data.get('vehicle_type', '')
+    if vehicle == 'Bike':
+        suggestions.append("Consider food delivery during peak meal times to maximize bike efficiency and earnings.")
+    elif vehicle == 'Car':
+        suggestions.append("Focus on longer rides and premium services to maximize car utilization and earnings.")
+    
+    return suggestions[:5]  # Return top 5 suggestions
+
+def get_loan_giver_ranges() -> LoanGiverRanges:
+    """Get loan giver score ranges for Indian market"""
+    return LoanGiverRanges(
+        excellent="80-100: Premium borrower - Lowest interest rates (8-12% APR), highest loan amounts (₹5L+), minimal documentation required",
+        good="65-79: Good borrower - Competitive rates (12-18% APR), standard loan amounts (₹2-5L), regular documentation needed",
+        fair="50-64: Fair borrower - Higher rates (18-24% APR), moderate loan amounts (₹50K-2L), additional verification required",
+        poor="Below 50: High-risk borrower - Highest rates (24%+ APR), limited loan amounts (₹10-50K), extensive documentation and collateral needed"
+    )
 
 def get_feature_explanations(features: np.ndarray, feature_names: List[str]) -> List[FeatureImportance]:
     """Generate feature importance explanations"""
@@ -190,12 +260,12 @@ def get_feature_explanations(features: np.ndarray, feature_names: List[str]) -> 
         explanation = f"Current value: {value:.2f}"
         
         if "earnings" in feature_name.lower():
-            if value > 3000:
+            if value > 25000:
                 impact = "positive"
-                explanation = f"Strong earnings of ${value:.0f} indicate good income stability"
-            elif value < 1000:
+                explanation = f"Strong earnings of ₹{value:.0f} indicate good income stability"
+            elif value < 10000:
                 impact = "negative"
-                explanation = f"Lower earnings of ${value:.0f} may indicate income instability"
+                explanation = f"Lower earnings of ₹{value:.0f} may indicate income instability"
                 
         elif "rating" in feature_name.lower():
             if value >= 4.5:
@@ -271,12 +341,18 @@ async def predict_nova_score(request: NovaScoreRequest):
         # Get feature explanations
         top_features = get_feature_explanations(features, feature_columns)
         
+        # Generate suggestions and loan giver ranges
+        suggestions = generate_suggestions(request_data, score)
+        loan_ranges = get_loan_giver_ranges()
+        
         return NovaScoreResponse(
             score=round(score, 1),
             risk_level=risk_level,
             recommendation=recommendation,
             top_features=top_features,
-            model_confidence=round(confidence, 1)
+            model_confidence=round(confidence, 1),
+            suggestions=suggestions,
+            loan_giver_ranges=loan_ranges
         )
         
     except Exception as e:

@@ -16,8 +16,12 @@ import {
   ArrowRight,
   CheckCircle,
   AlertCircle,
-  Target
+  Target,
+  MapPin,
+  Car,
+  Lightbulb
 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 
 // Icon animation hook
@@ -59,6 +63,8 @@ interface FormData {
   trips_m4: string;
   trips_m5: string;
   cancellation_rate: string;
+  city: string;
+  vehicle_type: string;
 }
 
 interface ScoreResult {
@@ -71,6 +77,13 @@ interface ScoreResult {
   }>;
   recommendation: string;
   riskLevel: 'low' | 'medium' | 'high';
+  suggestions: string[];
+  loanGiverRanges: {
+    excellent: string;
+    good: string;
+    fair: string;
+    poor: string;
+  };
 }
 
 const NovaScoreForm: React.FC = () => {
@@ -91,7 +104,9 @@ const NovaScoreForm: React.FC = () => {
     earnings_m6: '',
     trips_m4: '',
     trips_m5: '',
-    cancellation_rate: ''
+    cancellation_rate: '',
+    city: '',
+    vehicle_type: ''
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -118,32 +133,35 @@ const NovaScoreForm: React.FC = () => {
   const loadDemoData = () => {
     triggerIconAnimation('sparkles', 'spin');
     
+    // Demo data optimized for ~75 Nova Score (Indian context)
     setFormData({
-      monthly_earnings: '3500',
-      active_days_per_month: '22',
-      avg_rating: 4.7,
-      earnings_avg_6mo: '3400',
-      earnings_avg_3mo: '3600',
-      earnings_per_active_day: '159',
-      earnings_m1: '3800',
-      earnings_m2: '3600',
-      earnings_m3: '3400',
-      earnings_m4: '3200',
-      earnings_m5: '3300',
-      earnings_m6: '3100',
-      trips_m4: '180',
-      trips_m5: '190',
-      cancellation_rate: '2.3'
+      monthly_earnings: '28500', // ₹28,500 (~$340)
+      active_days_per_month: '24',
+      avg_rating: 4.6,
+      earnings_avg_6mo: '27800', // ₹27,800
+      earnings_avg_3mo: '29200', // ₹29,200
+      earnings_per_active_day: '1187', // ₹1,187 per day
+      earnings_m1: '30500', // ₹30,500
+      earnings_m2: '29800', // ₹29,800
+      earnings_m3: '28200', // ₹28,200
+      earnings_m4: '27500', // ₹27,500
+      earnings_m5: '26800', // ₹26,800
+      earnings_m6: '25900', // ₹25,900
+      trips_m4: '165',
+      trips_m5: '172',
+      cancellation_rate: '3.2',
+      city: 'Mumbai',
+      vehicle_type: 'Bike'
     });
     
     toast({
       title: "Demo data loaded! 🎯",
-      description: "Sample gig worker profile ready for scoring.",
+      description: "Sample Indian gig worker profile ready for scoring.",
     });
   };
 
   const calculateNovaScore = (data: FormData): ScoreResult => {
-    // Mock scoring algorithm based on real ML model insights
+    // Enhanced scoring algorithm for Indian context (INR values)
     let score = 60; // Base score
     
     const monthlyEarnings = parseFloat(data.monthly_earnings) || 0;
@@ -152,13 +170,15 @@ const NovaScoreForm: React.FC = () => {
     const earningsPerDay = parseFloat(data.earnings_per_active_day) || 0;
     const cancellationRate = parseFloat(data.cancellation_rate) || 0;
     
-    // Earnings stability (most important feature)
-    if (monthlyEarnings > 3000) score += 15;
-    else if (monthlyEarnings > 2000) score += 10;
-    else if (monthlyEarnings > 1000) score += 5;
+    // Earnings stability (adjusted for Indian market - INR values)
+    if (monthlyEarnings > 25000) score += 15; // ₹25,000+
+    else if (monthlyEarnings > 18000) score += 12; // ₹18,000+
+    else if (monthlyEarnings > 12000) score += 8; // ₹12,000+
+    else if (monthlyEarnings > 8000) score += 4; // ₹8,000+
     
     // Active days (consistency)
-    if (activeDays >= 20) score += 10;
+    if (activeDays >= 25) score += 12;
+    else if (activeDays >= 20) score += 10;
     else if (activeDays >= 15) score += 7;
     else if (activeDays >= 10) score += 4;
     
@@ -168,14 +188,23 @@ const NovaScoreForm: React.FC = () => {
     else if (rating >= 4.0) score += 4;
     else score -= 5;
     
-    // Earnings per day efficiency
-    if (earningsPerDay > 150) score += 8;
-    else if (earningsPerDay > 100) score += 5;
+    // Earnings per day efficiency (INR)
+    if (earningsPerDay > 1200) score += 8; // ₹1,200+/day
+    else if (earningsPerDay > 800) score += 5; // ₹800+/day
+    else if (earningsPerDay > 500) score += 2; // ₹500+/day
     
     // Cancellation rate (penalty)
     if (cancellationRate < 2) score += 5;
     else if (cancellationRate > 8) score -= 10;
     else if (cancellationRate > 5) score -= 5;
+    
+    // City bonus (metro cities have higher earning potential)
+    const metroCities = ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai'];
+    if (metroCities.includes(data.city)) score += 3;
+    
+    // Vehicle type bonus
+    if (data.vehicle_type === 'Car') score += 2;
+    else if (data.vehicle_type === 'Bike') score += 1;
     
     // Monthly trend analysis
     const recentEarnings = [
@@ -192,12 +221,12 @@ const NovaScoreForm: React.FC = () => {
     // Determine top features and explanations
     const topFeatures = [];
     
-    if (monthlyEarnings > 2500) {
+    if (monthlyEarnings > 20000) {
       topFeatures.push({
         name: 'Strong Monthly Earnings',
-        value: `$${monthlyEarnings}`,
+        value: `₹${monthlyEarnings.toLocaleString('en-IN')}`,
         impact: 'positive' as const,
-        explanation: 'Your consistent monthly income shows financial stability and strong earning potential.'
+        explanation: 'Your consistent monthly income shows financial stability and strong earning potential in the Indian gig economy.'
       });
     }
     
@@ -235,6 +264,24 @@ const NovaScoreForm: React.FC = () => {
       });
     }
     
+    // Generate suggestions for improvement
+    const suggestions = [];
+    if (monthlyEarnings < 20000) {
+      suggestions.push("Increase your monthly earnings by working more active days or optimizing your routes for higher efficiency.");
+    }
+    if (cancellationRate > 3) {
+      suggestions.push("Reduce your cancellation rate by better planning and accepting only orders you can complete.");
+    }
+    if (rating < 4.5) {
+      suggestions.push("Improve customer service to boost your ratings - be punctual, polite, and maintain vehicle cleanliness.");
+    }
+    if (activeDays < 20) {
+      suggestions.push("Increase your active working days to show more consistency and reliability to lenders.");
+    }
+    if (earningsPerDay < 1000) {
+      suggestions.push("Focus on peak hours and high-demand areas to increase your daily earnings efficiency.");
+    }
+    
     // Generate recommendation
     let recommendation = '';
     let riskLevel: 'low' | 'medium' | 'high' = 'medium';
@@ -253,11 +300,21 @@ const NovaScoreForm: React.FC = () => {
       riskLevel = 'high';
     }
     
+    // Loan giver ranges
+    const loanGiverRanges = {
+      excellent: "80-100: Premium borrower - minimal documentation",
+      good: "65-79: Good borrower - regular documentation",
+      fair: "50-64: Fair borrower - additional verification required",
+      poor: "Below 50: High-risk borrower - extensive documentation needed"
+    };
+    
     return {
       score,
       topFeatures: topFeatures.slice(0, 3),
       recommendation,
-      riskLevel
+      riskLevel,
+      suggestions: suggestions.slice(0, 3),
+      loanGiverRanges
     };
   };
 
@@ -269,7 +326,7 @@ const NovaScoreForm: React.FC = () => {
       'monthly_earnings', 'active_days_per_month', 'earnings_per_active_day',
       'cancellation_rate', 'earnings_avg_6mo', 'earnings_avg_3mo',
       'earnings_m1', 'earnings_m2', 'earnings_m3', 'earnings_m4', 'earnings_m5', 'earnings_m6',
-      'trips_m4', 'trips_m5'
+      'trips_m4', 'trips_m5', 'city', 'vehicle_type'
     ];
     
     const errors = new Set<string>();
@@ -295,7 +352,7 @@ const NovaScoreForm: React.FC = () => {
     
     try {
       // Call the real API
-      const response = await fetch('http://localhost:3001/api/predict', {
+      const response = await fetch('http://localhost:8000/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -313,9 +370,16 @@ const NovaScoreForm: React.FC = () => {
       // Transform API response to match our interface
       const calculatedResult: ScoreResult = {
         score: apiResult.score,
-        topFeatures: apiResult.topFeatures,
+        topFeatures: apiResult.top_features || [],
         recommendation: apiResult.recommendation,
-        riskLevel: apiResult.riskLevel
+        riskLevel: apiResult.risk_level,
+        suggestions: apiResult.suggestions || [],
+        loanGiverRanges: apiResult.loan_giver_ranges || {
+          excellent: "80-100: Premium borrower - minimal documentation",
+          good: "65-79: Good borrower - regular documentation",
+          fair: "50-64: Fair borrower - additional verification required",
+          poor: "Below 50: High-risk borrower - extensive documentation needed"
+        }
       };
       
       setResult(calculatedResult);
@@ -362,7 +426,9 @@ const NovaScoreForm: React.FC = () => {
       earnings_m6: '',
       trips_m4: '',
       trips_m5: '',
-      cancellation_rate: ''
+      cancellation_rate: '',
+      city: '',
+      vehicle_type: ''
     });
   };
 
@@ -387,7 +453,7 @@ const NovaScoreForm: React.FC = () => {
           </div>
         </Card>
 
-        {/* Top Features Analysis */}
+        {/* Top Features Analysis
         <Card className="nova-card p-6 stagger-item">
           <h4 className="text-xl font-semibold mb-6 flex items-center">
             <Target className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('target', 'pulse')}`} />
@@ -419,7 +485,62 @@ const NovaScoreForm: React.FC = () => {
               </div>
             ))}
           </div>
-        </Card>
+        </Card> */}
+
+        {/* Improvement Suggestions */}
+        {result.suggestions && result.suggestions.length > 0 && (
+          <Card className="nova-card p-6 stagger-item">
+            <h4 className="text-xl font-semibold mb-6 flex items-center">
+              <Lightbulb className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('lightbulb', 'pulse')}`} />
+              Suggestions to Improve Your Nova Score
+            </h4>
+            
+            <div className="space-y-4">
+              {result.suggestions.map((suggestion, index) => (
+                <div
+                  key={index}
+                  className="p-4 rounded-lg bg-blue-50 border-l-4 border-blue-400 transition-all duration-300 hover:bg-blue-100 stagger-item"
+                >
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-blue-400 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
+                      {index + 1}
+                    </div>
+                    <p className="text-sm text-blue-800 font-medium">{suggestion}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Loan Giver Score Ranges */}
+        {result.loanGiverRanges && (
+          <Card className="nova-card p-6 stagger-item">
+            <h4 className="text-xl font-semibold mb-6 flex items-center">
+              <TrendingUp className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('ranges', 'bounce')}`} />
+              Nova Score Ranges for Lenders
+            </h4>
+            
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-green-50 border-l-4 border-green-500">
+                <h5 className="font-semibold text-green-800 mb-2">Excellent (80-100)</h5>
+                <p className="text-sm text-green-700">{result.loanGiverRanges.excellent}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-blue-50 border-l-4 border-blue-500">
+                <h5 className="font-semibold text-blue-800 mb-2">Good (65-79)</h5>
+                <p className="text-sm text-blue-700">{result.loanGiverRanges.good}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-yellow-50 border-l-4 border-yellow-500">
+                <h5 className="font-semibold text-yellow-800 mb-2">Fair (50-64)</h5>
+                <p className="text-sm text-yellow-700">{result.loanGiverRanges.fair}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-red-50 border-l-4 border-red-500">
+                <h5 className="font-semibold text-red-800 mb-2">Poor (Below 50)</h5>
+                <p className="text-sm text-red-700">{result.loanGiverRanges.poor}</p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center stagger-item">
@@ -456,7 +577,7 @@ const NovaScoreForm: React.FC = () => {
         </h3>
         <p className="text-lg text-muted-enhanced max-w-2xl mx-auto mb-6 font-medium">
           Enter your gig work details to receive your personalized Nova Score.
-          All calculations are done securely and transparently.
+          All calculations are done securely and transparently. Values in Indian Rupees (₹).
         </p>
         
         <Button
@@ -470,29 +591,80 @@ const NovaScoreForm: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Location and Vehicle Information */}
+        <Card className="nova-card card-interactive p-6 slide-up stagger-item">
+          <h4 className="text-xl font-bold mb-6 flex items-center text-enhanced">
+            <MapPin className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('location', 'bounce')}`} />
+            Location & Vehicle Details
+          </h4>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className={`space-y-2 field-focus ${fieldErrors.has('city') ? 'field-error' : ''}`}>
+              <Label htmlFor="city" className="flex items-center">
+                City *
+                <Info className="w-4 h-4 ml-1 text-muted-foreground icon-hover" />
+              </Label>
+              <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
+                <SelectTrigger className={`text-lg transition-all duration-200 ${fieldErrors.has('city') ? 'border-error ring-error/20' : ''}`}>
+                  <SelectValue placeholder="Select your city" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Mumbai">Mumbai</SelectItem>
+                  <SelectItem value="Delhi">Delhi</SelectItem>
+                  <SelectItem value="Bengaluru">Bengaluru</SelectItem>
+                  <SelectItem value="Chennai">Chennai</SelectItem>
+                  <SelectItem value="Kolkata">Kolkata</SelectItem>
+                  {/* <SelectItem value="Pune">Pune</SelectItem>
+                  <SelectItem value="Hyderabad">Hyderabad</SelectItem>
+                  <SelectItem value="Ahmedabad">Ahmedabad</SelectItem> */}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-enhanced font-medium">Your primary working city</p>
+            </div>
+
+            <div className={`space-y-2 field-focus ${fieldErrors.has('vehicle_type') ? 'field-error' : ''}`}>
+              <Label htmlFor="vehicle_type" className="flex items-center">
+                Vehicle Type *
+                <Car className="w-4 h-4 ml-1 text-muted-foreground icon-hover" />
+              </Label>
+              <Select value={formData.vehicle_type} onValueChange={(value) => handleInputChange('vehicle_type', value)}>
+                <SelectTrigger className={`text-lg transition-all duration-200 ${fieldErrors.has('vehicle_type') ? 'border-error ring-error/20' : ''}`}>
+                  <SelectValue placeholder="Select your vehicle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Bike">🏍️ Bike/Motorcycle</SelectItem>
+                  <SelectItem value="Car">🚗 Car</SelectItem>
+                  <SelectItem value="Auto">🛺 Auto Rickshaw</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-enhanced font-medium">Primary vehicle used for gig work</p>
+            </div>
+          </div>
+        </Card>
+
         {/* Basic Information */}
         <Card className="nova-card card-interactive p-6 slide-up stagger-item">
           <h4 className="text-xl font-bold mb-6 flex items-center text-enhanced">
             <DollarSign className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('dollar', 'bounce')}`} />
-            Basic Earnings Information
+            Basic Earnings Information (₹ INR)
           </h4>
           
           <div className="grid md:grid-cols-2 gap-6">
             <div className={`space-y-2 field-focus ${fieldErrors.has('monthly_earnings') ? 'field-error' : ''}`}>
               <Label htmlFor="monthly_earnings" className="flex items-center">
-                Monthly Earnings *
+                Monthly Earnings (₹) *
                 <Info className="w-4 h-4 ml-1 text-muted-foreground icon-hover" />
               </Label>
               <Input
                 id="monthly_earnings"
                 type="number"
-                placeholder="3500"
+                placeholder="28500"
                 value={formData.monthly_earnings}
                 onChange={(e) => handleInputChange('monthly_earnings', e.target.value)}
                 className={`text-lg transition-all duration-200 ${fieldErrors.has('monthly_earnings') ? 'border-error ring-error/20' : ''}`}
                 required
               />
-              <p className="text-sm text-muted-enhanced font-medium">Your typical monthly income from gig work</p>
+              <p className="text-sm text-muted-enhanced font-medium">Your typical monthly income from gig work in Indian Rupees</p>
             </div>
 
             <div className={`space-y-2 field-focus ${fieldErrors.has('active_days_per_month') ? 'field-error' : ''}`}>
@@ -500,7 +672,7 @@ const NovaScoreForm: React.FC = () => {
               <Input
                 id="active_days"
                 type="number"
-                placeholder="22"
+                placeholder="24"
                 value={formData.active_days_per_month}
                 onChange={(e) => handleInputChange('active_days_per_month', e.target.value)}
                 className={`text-lg transition-all duration-200 ${fieldErrors.has('active_days_per_month') ? 'border-error ring-error/20' : ''}`}
@@ -510,17 +682,17 @@ const NovaScoreForm: React.FC = () => {
             </div>
 
             <div className={`space-y-2 field-focus ${fieldErrors.has('earnings_per_active_day') ? 'field-error' : ''}`}>
-              <Label htmlFor="earnings_per_day">Earnings per Active Day *</Label>
+              <Label htmlFor="earnings_per_day">Earnings per Active Day (₹) *</Label>
               <Input
                 id="earnings_per_day"
                 type="number"
-                placeholder="159"
+                placeholder="1187"
                 value={formData.earnings_per_active_day}
                 onChange={(e) => handleInputChange('earnings_per_active_day', e.target.value)}
                 className={`text-lg transition-all duration-200 ${fieldErrors.has('earnings_per_active_day') ? 'border-error ring-error/20' : ''}`}
                 required
               />
-              <p className="text-sm text-muted-enhanced font-medium">Average daily earnings when you work</p>
+              <p className="text-sm text-muted-enhanced font-medium">Average daily earnings when you work (in ₹)</p>
             </div>
 
             <div className={`space-y-2 field-focus ${fieldErrors.has('cancellation_rate') ? 'field-error' : ''}`}>
@@ -529,7 +701,7 @@ const NovaScoreForm: React.FC = () => {
                 id="cancellation_rate"
                 type="number"
                 step="0.1"
-                placeholder="2.3"
+                placeholder="3.2"
                 value={formData.cancellation_rate}
                 onChange={(e) => handleInputChange('cancellation_rate', e.target.value)}
                 className={`text-lg transition-all duration-200 ${fieldErrors.has('cancellation_rate') ? 'border-error ring-error/20' : ''}`}
@@ -571,16 +743,16 @@ const NovaScoreForm: React.FC = () => {
         <Card className="nova-card card-interactive p-6 slide-up stagger-item">
           <h4 className="text-xl font-semibold mb-6 flex items-center">
             <TrendingUp className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('trending', 'bounce')}`} />
-            Monthly Earnings Trends
+            Monthly Earnings Trends (₹ INR)
           </h4>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div className={`space-y-2 field-focus ${fieldErrors.has('earnings_avg_6mo') ? 'field-error' : ''}`}>
-              <Label htmlFor="earnings_avg_6mo">6-Month Average *</Label>
+              <Label htmlFor="earnings_avg_6mo">6-Month Average (₹) *</Label>
               <Input
                 id="earnings_avg_6mo"
                 type="number"
-                placeholder="3400"
+                placeholder="27800"
                 value={formData.earnings_avg_6mo}
                 onChange={(e) => handleInputChange('earnings_avg_6mo', e.target.value)}
                 className={`transition-all duration-200 ${fieldErrors.has('earnings_avg_6mo') ? 'border-error ring-error/20' : ''}`}
@@ -589,11 +761,11 @@ const NovaScoreForm: React.FC = () => {
             </div>
 
             <div className={`space-y-2 field-focus ${fieldErrors.has('earnings_avg_3mo') ? 'field-error' : ''}`}>
-              <Label htmlFor="earnings_avg_3mo">3-Month Average *</Label>
+              <Label htmlFor="earnings_avg_3mo">3-Month Average (₹) *</Label>
               <Input
                 id="earnings_avg_3mo"
                 type="number"
-                placeholder="3600"
+                placeholder="29200"
                 value={formData.earnings_avg_3mo}
                 onChange={(e) => handleInputChange('earnings_avg_3mo', e.target.value)}
                 className={`transition-all duration-200 ${fieldErrors.has('earnings_avg_3mo') ? 'border-error ring-error/20' : ''}`}
@@ -603,16 +775,16 @@ const NovaScoreForm: React.FC = () => {
           </div>
 
           <div className="mt-6 grid md:grid-cols-3 gap-4">
-            <h5 className="font-medium md:col-span-3 mb-2">Individual Month Earnings *</h5>
+            <h5 className="font-medium md:col-span-3 mb-2">Individual Month Earnings (₹) *</h5>
             {[1, 2, 3, 4, 5, 6].map((month) => (
               <div key={month} className={`space-y-1 field-focus ${fieldErrors.has(`earnings_m${month}` as keyof FormData) ? 'field-error' : ''}`}>
                 <Label htmlFor={`earnings_m${month}`} className="text-sm">
-                  Month {month} Ago *
+                  Month {month} Ago (₹) *
                 </Label>
                 <Input
                   id={`earnings_m${month}`}
                   type="number"
-                  placeholder={month <= 3 ? "3600" : "3200"}
+                  placeholder={month <= 3 ? "29000" : "26000"}
                   value={formData[`earnings_m${month}` as keyof FormData]}
                   onChange={(e) => handleInputChange(`earnings_m${month}` as keyof FormData, e.target.value)}
                   className={`text-sm transition-all duration-200 ${fieldErrors.has(`earnings_m${month}` as keyof FormData) ? 'border-error ring-error/20' : ''}`}
