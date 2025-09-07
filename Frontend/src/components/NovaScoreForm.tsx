@@ -156,7 +156,7 @@ const NovaScoreForm: React.FC = () => {
     
     toast({
       title: "Demo data loaded! 🎯",
-      description: "Sample Indian gig worker profile ready for scoring (~75 Nova Score).",
+      description: "Sample Indian gig worker profile ready for scoring.",
     });
   };
 
@@ -302,10 +302,10 @@ const NovaScoreForm: React.FC = () => {
     
     // Loan giver ranges
     const loanGiverRanges = {
-      excellent: "80-100: Premium borrower - Lowest interest rates, highest loan amounts, minimal documentation",
-      good: "65-79: Good borrower - Competitive rates, standard loan amounts, regular documentation",
-      fair: "50-64: Fair borrower - Higher rates, moderate loan amounts, additional verification required",
-      poor: "Below 50: High-risk borrower - Highest rates, limited loan amounts, extensive documentation needed"
+      excellent: "80-100: Premium borrower - minimal documentation",
+      good: "65-79: Good borrower - regular documentation",
+      fair: "50-64: Fair borrower - additional verification required",
+      poor: "Below 50: High-risk borrower - extensive documentation needed"
     };
     
     return {
@@ -375,10 +375,10 @@ const NovaScoreForm: React.FC = () => {
         riskLevel: apiResult.risk_level,
         suggestions: apiResult.suggestions || [],
         loanGiverRanges: apiResult.loan_giver_ranges || {
-          excellent: "80-100: Premium borrower",
-          good: "65-79: Good borrower",
-          fair: "50-64: Fair borrower",
-          poor: "Below 50: High-risk borrower"
+          excellent: "80-100: Premium borrower - minimal documentation",
+          good: "65-79: Good borrower - regular documentation",
+          fair: "50-64: Fair borrower - additional verification required",
+          poor: "Below 50: High-risk borrower - extensive documentation needed"
         }
       };
       
@@ -453,7 +453,7 @@ const NovaScoreForm: React.FC = () => {
           </div>
         </Card>
 
-        {/* Top Features Analysis */}
+        {/* Top Features Analysis
         <Card className="nova-card p-6 stagger-item">
           <h4 className="text-xl font-semibold mb-6 flex items-center">
             <Target className={`w-6 h-6 mr-2 text-primary icon-hover ${getIconClasses('target', 'pulse')}`} />
@@ -485,7 +485,7 @@ const NovaScoreForm: React.FC = () => {
               </div>
             ))}
           </div>
-        </Card>
+        </Card> */}
 
         {/* Improvement Suggestions */}
         {result.suggestions && result.suggestions.length > 0 && (
@@ -614,9 +614,9 @@ const NovaScoreForm: React.FC = () => {
                   <SelectItem value="Bengaluru">Bengaluru</SelectItem>
                   <SelectItem value="Chennai">Chennai</SelectItem>
                   <SelectItem value="Kolkata">Kolkata</SelectItem>
-                  <SelectItem value="Pune">Pune</SelectItem>
+                  {/* <SelectItem value="Pune">Pune</SelectItem>
                   <SelectItem value="Hyderabad">Hyderabad</SelectItem>
-                  <SelectItem value="Ahmedabad">Ahmedabad</SelectItem>
+                  <SelectItem value="Ahmedabad">Ahmedabad</SelectItem> */}
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-enhanced font-medium">Your primary working city</p>
