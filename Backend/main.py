@@ -36,8 +36,8 @@ def load_model():
     """Load the XGBoost model and feature columns"""
     global model, feature_columns
     try:
-        model_path = Path("../ML_Models/xgb_tuned.joblib")
-        features_path = Path("../ML_Models/feature_columns.joblib")
+        model_path = Path("ML_Models/xgb_tuned.joblib")
+        features_path = Path("ML_Models/feature_columns.joblib")
         
         if not model_path.exists():
             raise FileNotFoundError(f"Model file not found: {model_path}")
