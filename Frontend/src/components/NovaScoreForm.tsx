@@ -267,7 +267,9 @@ const NovaScoreForm: React.FC = () => {
     // Validate required fields
     const requiredFields: (keyof FormData)[] = [
       'monthly_earnings', 'active_days_per_month', 'earnings_per_active_day',
-      'cancellation_rate', 'earnings_avg_6mo', 'earnings_avg_3mo'
+      'cancellation_rate', 'earnings_avg_6mo', 'earnings_avg_3mo',
+      'earnings_m1', 'earnings_m2', 'earnings_m3', 'earnings_m4', 'earnings_m5', 'earnings_m6',
+      'trips_m4', 'trips_m5'
     ];
     
     const errors = new Set<string>();
@@ -291,18 +293,55 @@ const NovaScoreForm: React.FC = () => {
     triggerIconAnimation('calculate', 'spin');
     setIsLoading(true);
     
-    // Simulate API call with loading animation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const calculatedResult = calculateNovaScore(formData);
-    setResult(calculatedResult);
-    setIsLoading(false);
-    setShowForm(false);
-    
-    toast({
-      title: "Nova Score calculated! 🎉",
-      description: `Your score: ${calculatedResult.score}/100`,
-    });
+    try {
+      // Call the real API
+      const response = await fetch('http://localhost:3001/api/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      const apiResult = await response.json();
+      
+      // Transform API response to match our interface
+      const calculatedResult: ScoreResult = {
+        score: apiResult.score,
+        topFeatures: apiResult.topFeatures,
+        recommendation: apiResult.recommendation,
+        riskLevel: apiResult.riskLevel
+      };
+      
+      setResult(calculatedResult);
+      setIsLoading(false);
+      setShowForm(false);
+      
+      toast({
+        title: "Nova Score calculated! 🎉",
+        description: `Your score: ${calculatedResult.score}/100`,
+      });
+      
+    } catch (error) {
+      console.error('API Error:', error);
+      setIsLoading(false);
+      
+      // Fallback to mock calculation if API fails
+      toast({
+        title: "API temporarily unavailable",
+        description: "Using fallback calculation. Please ensure backend servers are running.",
+        variant: "destructive"
+      });
+      
+      const calculatedResult = calculateNovaScore(formData);
+      setResult(calculatedResult);
+      setShowForm(false);
+    }
   };
 
   const resetForm = () => {
@@ -564,11 +603,11 @@ const NovaScoreForm: React.FC = () => {
           </div>
 
           <div className="mt-6 grid md:grid-cols-3 gap-4">
-            <h5 className="font-medium md:col-span-3 mb-2">Individual Month Earnings</h5>
+            <h5 className="font-medium md:col-span-3 mb-2">Individual Month Earnings *</h5>
             {[1, 2, 3, 4, 5, 6].map((month) => (
-              <div key={month} className="space-y-1 field-focus">
+              <div key={month} className={`space-y-1 field-focus ${fieldErrors.has(`earnings_m${month}` as keyof FormData) ? 'field-error' : ''}`}>
                 <Label htmlFor={`earnings_m${month}`} className="text-sm">
-                  Month {month} Ago
+                  Month {month} Ago *
                 </Label>
                 <Input
                   id={`earnings_m${month}`}
@@ -576,7 +615,7 @@ const NovaScoreForm: React.FC = () => {
                   placeholder={month <= 3 ? "3600" : "3200"}
                   value={formData[`earnings_m${month}` as keyof FormData]}
                   onChange={(e) => handleInputChange(`earnings_m${month}` as keyof FormData, e.target.value)}
-                  className="text-sm transition-all duration-200"
+                  className={`text-sm transition-all duration-200 ${fieldErrors.has(`earnings_m${month}` as keyof FormData) ? 'border-error ring-error/20' : ''}`}
                   required
                 />
               </div>
@@ -592,30 +631,32 @@ const NovaScoreForm: React.FC = () => {
           </h4>
           
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-2 field-focus">
-              <Label htmlFor="trips_m4">Trips/Orders (4 Months Ago)</Label>
+            <div className={`space-y-2 field-focus ${fieldErrors.has('trips_m4') ? 'field-error' : ''}`}>
+              <Label htmlFor="trips_m4">Trips/Orders (4 Months Ago) *</Label>
               <Input
                 id="trips_m4"
                 type="number"
                 placeholder="180"
                 value={formData.trips_m4}
                 onChange={(e) => handleInputChange('trips_m4', e.target.value)}
-                className="transition-all duration-200"
+                className={`transition-all duration-200 ${fieldErrors.has('trips_m4') ? 'border-error ring-error/20' : ''}`}
                 required
               />
+              <p className="text-sm text-muted-enhanced font-medium">Number of completed trips/orders</p>
             </div>
 
-            <div className="space-y-2 field-focus">
-              <Label htmlFor="trips_m5">Trips/Orders (5 Months Ago)</Label>
+            <div className={`space-y-2 field-focus ${fieldErrors.has('trips_m5') ? 'field-error' : ''}`}>
+              <Label htmlFor="trips_m5">Trips/Orders (5 Months Ago) *</Label>
               <Input
                 id="trips_m5"
                 type="number"
                 placeholder="190"
                 value={formData.trips_m5}
                 onChange={(e) => handleInputChange('trips_m5', e.target.value)}
-                className="transition-all duration-200"
+                className={`transition-all duration-200 ${fieldErrors.has('trips_m5') ? 'border-error ring-error/20' : ''}`}
                 required
               />
+              <p className="text-sm text-muted-enhanced font-medium">Number of completed trips/orders</p>
             </div>
           </div>
         </Card>

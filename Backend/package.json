@@ -1,0 +1,39 @@
+{
+  "name": "nova-score-backend",
+  "version": "1.0.0",
+  "description": "Node.js middleware server for Nova Score API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "install-deps": "npm install",
+    "setup-python": "pip install -r requirements.txt",
+    "start-fastapi": "cd .. && python -m uvicorn Backend.main:app --reload --host 0.0.0.0 --port 8000",
+    "start-all": "concurrently \"npm run start-fastapi\" \"npm run dev\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "fastapi",
+    "proxy",
+    "xgboost",
+    "ml",
+    "credit-scoring"
+  ],
+  "author": "Nova Score Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "http-proxy-middleware": "^2.0.6",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
