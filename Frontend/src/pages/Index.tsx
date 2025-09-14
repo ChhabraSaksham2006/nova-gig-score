@@ -139,7 +139,7 @@ const Index = () => {
                 aria-label="Learn how Nova Score works"
               >
                 <Play className="w-5 h-5 mr-2" aria-hidden="true" />
-                How It Works
+                <a href="https://youtu.be/cBY1XDhjrOE?si=Q4wPMza86EeAdsH3">How It Works</a>
               </Button>
             </div>
           </div>
